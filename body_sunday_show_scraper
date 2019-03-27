@@ -65,7 +65,6 @@ html_sotu=br.response().read()
 
 cnn_soup = BeautifulSoup(html_sotu, 'html.parser')
 transcript_sotu = cnn_soup.findAll('p', {'class':'cnnBodyText'})[-1]
-str(transcript_sotu).replace('<br>','\n').replace('<br/>','\n')
 
 file = open('Sunday_Shows_Scraper/sotu'+datetime.date(newest_cbs_program).strftime('%m%d%y')+'.txt',"w")
 file.write(str(transcript_sotu).replace('<br>','\n').replace('<br/>','\n'))
@@ -83,9 +82,10 @@ br.open(url_abc)
 html_abc_child = br.response().read()
 abc_show_soup = BeautifulSoup(html_abc_child, 'html.parser')
 
-transcript_abc = abc_show_soup.findAll('p')
+transcript_abc = abc_show_soup.findAll('p')[2:]
 file = open('Sunday_Shows_Scraper/abc'+datetime.date(newest_cbs_program).strftime('%m%d%y')+'.txt',"w")
-file.write(nbc_rough(transcript_abc))
+file.write(str(transcript_abc).replace('<p>\\n','\n').replace('\\n</p>,', '\n')
+	.replace('\\u2026','...').replace('\\u2013','--').replace('\\u2019','\''))
 
 # Let's get Fox
 parent_url_fox = 'https://www.foxnews.com/category/shows/fox-news-sunday'
