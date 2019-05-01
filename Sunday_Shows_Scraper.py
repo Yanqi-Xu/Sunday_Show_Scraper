@@ -139,48 +139,11 @@ speaker_chunks = chunks[1]
 """for speaker, chunk in zip(speakers,chunks):
     print(speaker,':', chunk)
     print('-----------------------------------------------------------------------------------------')"""
-# with open('claims.csv', 'w') as csvfile:
-#     writer = csv.writer(csvfile)
-#     for i,j in zip(speakers, speaker_chunks):
-#         writer.writerow([i,j])
 
-def submit_claimbuster(speakers,speaker_chunks):
-    """Submit chunks of text to the Claimbuster API for scoring and store response in a dictionary """
-    all_claims_responses = []
-    print('Submitting claims to Claimbuster')
-    num_errors = 0
-    num_claims = 0
-    buster_base = 'https://idir.uta.edu/factchecker/score_text/'
-    buster_end = '?format=json'
+with open('claimscbs.csv', 'w') as csvfile:
+    writer = csv.writer(csvfile)
+     for i,j in zip(speakers, speaker_chunks):
+         writer.writerow([i,j])
 
-    for speaker, chunk in zip(speakers, speaker_chunks):
-        if speaker != show_host:
-            try:
-                submissionLink = buster_base+chunk+buster_end
-                api_response = requests.get(submissionLink).json() # submit to API with GET request
-
-                for statement in api_response['results']:
-                    insert = {}
-                    insert['speaker'] = speaker
-                    insert['claim'] = statement['text'].strip()
-                    insert['score'] = round(float(statement['score']),3)
-                    insert['date'] = db_date
-                    insert['link'] = url_cbs
-                    num_claims+=1
-                    all_claims_responses.append(insert)
-                    if num_claims%100 == 0:
-                        print(num_claims,'claims processed')
-
-            except Exception as e:
-                print('error',e)
-                num_errors+=1
-    return all_claims_responses
-
-claimbust_dicts = submit_claimbuster(speakers, speaker_chunks)
-fields = claimbust_dicts[0].keys()
-with open('Sunday_Shows_Scraper/claimscbs0428.csv', 'w') as csvfile:
-    writer = csv.DictWriter(csvfile, fields)
-    writer.writeheader()
-    writer.writerows(claimbust_dicts)
 
 
